@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BookStore.Models.Respositories
 {
-    interface IBookStoreRepository<TEntity>
+    public interface IBookStoreRepository<TEntity>
     {
         IList<TEntity> list();
         TEntity Find(int id);
