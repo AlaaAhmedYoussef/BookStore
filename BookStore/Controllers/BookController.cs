@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Models;
 using BookStore.Models.Respositories;
+using BookStore.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,12 @@ namespace BookStore.Controllers
     public class BookController : Controller
     {
         private readonly IBookStoreRepository<Book> bookRepository;
+        private readonly IBookStoreRepository<Author> authorRepository;
 
-        public BookController(IBookStoreRepository<Book> bookRepository)
+        public BookController(IBookStoreRepository<Book> bookRepository, IBookStoreRepository<Author> authorRepository)
         {
             this.bookRepository = bookRepository;
+            this.authorRepository = authorRepository;
         }
 
         // GET: Book
@@ -37,17 +40,29 @@ namespace BookStore.Controllers
         // GET: Book/Create
         public ActionResult Create()
         {
-            return View();
+            var model = new BookAuthorViewModel
+            {
+                Authors = authorRepository.list().ToList()
+            };
+            return View(model);
         }
 
         // POST: Book/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(BookAuthorViewModel model)
         {
             try
             {
-                // TODO: Add insert logic here
+                var author = authorRepository.Find(model.AuthorId);
+                var book = new Book
+                {
+                    Id = model.BookId,
+                    Title = model.Title,
+                    Description = model.Description,
+                    Author = author
+                };
+                bookRepository.Add(book);
 
                 return RedirectToAction(nameof(Index));
             }
