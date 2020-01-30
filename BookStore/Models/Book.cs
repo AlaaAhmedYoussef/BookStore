@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 
 namespace BookStore.Models
 {
-    public class Author
+    public class Book
     {
         public int ID { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
 
-        public string FullName { get; set; }
-
+        public Author Author { get; set; }
     }
 }
