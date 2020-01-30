@@ -40,11 +40,12 @@ namespace BookStore.Controllers
         // POST: Author/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Author author)
         {
             try
             {
                 // TODO: Add insert logic here
+                authorRepository.Add(author);
 
                 return RedirectToAction(nameof(Index));
             }
