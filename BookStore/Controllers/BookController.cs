@@ -40,26 +40,36 @@ namespace BookStore.Controllers
         // GET: Book/Create
         public ActionResult Create()
         {
-            var model = new BookAuthorViewModel
+            var vModel = new BookAuthorViewModel
             {
-                Authors = authorRepository.list().ToList()
+                Authors = FillSelectList()
             };
-            return View(model);
+            return View(vModel);
         }
 
         // POST: Book/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(BookAuthorViewModel model)
+        public ActionResult Create(BookAuthorViewModel vModel)
         {
             try
             {
-                var author = authorRepository.Find(model.AuthorId);
+                if (vModel.AuthorId < 0)
+                {
+                    ViewBag.Message = "Please select an Author from the list";
+
+                    var vm = new BookAuthorViewModel
+                    {
+                        Authors = FillSelectList()
+                    };
+                    return View(vm);
+                }
+                var author = authorRepository.Find(vModel.AuthorId);
                 var book = new Book
                 {
-                    Id = model.BookId,
-                    Title = model.Title,
-                    Description = model.Description,
+                    Id = vModel.BookId,
+                    Title = vModel.Title,
+                    Description = vModel.Description,
                     Author = author
                 };
                 bookRepository.Add(book);
@@ -75,17 +85,35 @@ namespace BookStore.Controllers
         // GET: Book/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var book = bookRepository.Find(id);
+            var authorId = book.Author == null ? book.Author.Id = 0 : book.Author.Id;
+            var vModel = new BookAuthorViewModel
+            {
+                BookId = book.Id,
+                Title = book.Title,
+                Description = book.Description,
+                AuthorId = authorId,
+                Authors = authorRepository.list().ToList()
+            };
+
+            return View(vModel);
         }
 
         // POST: Book/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, BookAuthorViewModel vModel)
         {
             try
             {
-                // TODO: Add update logic here
+                var author = authorRepository.Find(vModel.AuthorId);
+                var book = new Book
+                {
+                    Title = vModel.Title,
+                    Description = vModel.Description,
+                    Author = author
+                };
+                bookRepository.Update(id, book);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -116,6 +144,14 @@ namespace BookStore.Controllers
             {
                 return View();
             }
+        }
+
+        List<Author> FillSelectList()
+        {
+            var authors = authorRepository.list().ToList();
+            authors.Insert(0, new Author { Id = -1, FullName = "--- Please select an Author ---" });
+
+            return authors;
         }
     }
 }
