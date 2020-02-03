@@ -63,15 +63,7 @@ namespace BookStore.Controllers
             {
                 try
                 {
-                    string fileName = string.Empty;
-
-                    if (vModel.File != null)
-                    {
-                        string uploads = Path.Combine(hosting.WebRootPath, "uploads");
-                        fileName = vModel.File.FileName;
-                        string fullPath = Path.Combine(uploads, fileName);
-                        vModel.File.CopyTo(new FileStream(fullPath, FileMode.Create));   
-                    }
+                    string fileName = UploadFile(vModel.File) ?? string.Empty;
 
                     if (vModel.AuthorId < 0)
                     {
@@ -134,15 +126,20 @@ namespace BookStore.Controllers
                     string uploads = Path.Combine(hosting.WebRootPath, "uploads");
                     fileName = vModel.File.FileName;
                     string fullPath = Path.Combine(uploads, fileName);
-                    //Get the old file
-                    string oldFilename = bookRepository.Find(id).ImageUrl;
-                    string oldFullPath = Path.Combine(uploads, oldFilename);
-                    
+
+                    string oldFullPath = string.Empty;
+                    if (vModel.ImageUrl != null)
+                    {
+                        //Get the old file
+                        string oldFilename = vModel.ImageUrl;
+                        oldFullPath = Path.Combine(uploads, oldFilename);
+                        //Delete the old file
+                        System.IO.File.Delete(oldFullPath);
+                    }
+                  
                     // if the have the same path or name dont add it
                     if (oldFullPath != fullPath)
                     {
-                        //Delete the old file
-                        System.IO.File.Delete(oldFullPath);
                         //Save the new file
                         vModel.File.CopyTo(new FileStream(fullPath, FileMode.Create));
                     }
@@ -160,7 +157,7 @@ namespace BookStore.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch(Exception ex)
             {
                 return View();
             }
@@ -206,5 +203,18 @@ namespace BookStore.Controllers
             };
             return vModel;
         }
-    }
+
+        string UploadFile(IFormFile file)
+        {
+            if (file != null)
+            {
+                string uploads = Path.Combine(hosting.WebRootPath, "uploads");
+                string fullPath = Path.Combine(uploads, file.FileName);
+                file.CopyTo(new FileStream(fullPath, FileMode.Create));
+                return file.FileName;
+            }
+            return null;
+        }
+       
+}
 }

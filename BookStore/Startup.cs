@@ -28,8 +28,8 @@ namespace BookStore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddSingleton<IBookStoreRepository<Author>, AuthorRepository>();
-            services.AddSingleton<IBookStoreRepository<Book>, BookRepository>();
+            services.AddScoped<IBookStoreRepository<Author>, AuthorDBRepository>();
+            services.AddScoped<IBookStoreRepository<Book>, BookDBRepository>();
             services.AddDbContext<BookStoreDbContext>( options => 
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
@@ -45,7 +45,10 @@ namespace BookStore
             }
 
             app.UseStaticFiles();
-            app.UseMvcWithDefaultRoute();
+            app.UseMvc(route =>
+            {
+                route.MapRoute("default", "{controller=Book}/{action=Index}/{id?}");
+            });
             /*
             app.Run(async (context) =>
             {
