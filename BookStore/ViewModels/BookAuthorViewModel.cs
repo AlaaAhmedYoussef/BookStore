@@ -1,4 +1,5 @@
 ﻿using BookStore.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,5 +23,9 @@ namespace BookStore.ViewModels
         public int AuthorId { get; set; }
 
         public List<Author> Authors { get; set; }
+
+        //for all files here will be used for images only
+        public IFormFile File { get; set; }
+        public string ImageUrl { get; set; }
     }
 }

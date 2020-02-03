@@ -34,6 +34,15 @@
         <dd>
             @Html.DisplayFor(model => model.Author.FullName)
         </dd>
+        @if (Model.ImageUrl != null)
+        {
+            <dt>
+                Image
+            </dt>
+            <dd>
+                <img src="~/uploads/@Model.ImageUrl" alt="Book Image" style="width:128px" class="img-thumbnail">
+            </dd>
+        }
     </dl>
 </div>
 <div>

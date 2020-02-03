@@ -14,16 +14,24 @@ namespace BookStore.Models.Respositories
             {
                 new Book
                 {
-                    Id = 1, Title = "C# Programming", Description = "No Description", 
+                    Id = 1, Title = "C# Programming", 
+                    Description = "No Description", 
+                    ImageUrl = "apricots.jpg",
                     Author = new Author{ Id = 2 }
                 },
                 new Book
                 {
-                    Id = 2, Title = "Java Programming", Description = "Nothing", Author = new Author()
+                    Id = 2, Title = "Java Programming",
+                    Description = "Nothing",
+                    ImageUrl = "avocado.jpg",
+                    Author = new Author()
                 },
                 new Book
                 {
-                    Id = 3, Title = "Python Programming", Description = "No Data", Author = new Author()
+                    Id = 3, Title = "Python Programming",
+                    Description = "No Data",
+                    ImageUrl = "vegatables.jpg",
+                    Author = new Author()
                 },
             };
         }
@@ -61,6 +69,7 @@ namespace BookStore.Models.Respositories
             book.Title = newBook.Title;
             book.Description = newBook.Description;
             book.Author = newBook.Author;
+            book.ImageUrl = newBook.ImageUrl;
         }
     }
 }

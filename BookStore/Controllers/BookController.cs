@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Models;
 using BookStore.Models.Respositories;
 using BookStore.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,11 +16,15 @@ namespace BookStore.Controllers
     {
         private readonly IBookStoreRepository<Book> bookRepository;
         private readonly IBookStoreRepository<Author> authorRepository;
+        private readonly IHostingEnvironment hosting;
 
-        public BookController(IBookStoreRepository<Book> bookRepository, IBookStoreRepository<Author> authorRepository)
+        public BookController(IBookStoreRepository<Book> _bookRepository,
+            IBookStoreRepository<Author> _authorRepository,
+            IHostingEnvironment _hosting)
         {
-            this.bookRepository = bookRepository;
-            this.authorRepository = authorRepository;
+            this.bookRepository = _bookRepository;
+            this.authorRepository = _authorRepository;
+            hosting = _hosting;
         }
 
         // GET: Book
@@ -57,6 +63,16 @@ namespace BookStore.Controllers
             {
                 try
                 {
+                    string fileName = string.Empty;
+
+                    if (vModel.File != null)
+                    {
+                        string uploads = Path.Combine(hosting.WebRootPath, "uploads");
+                        fileName = vModel.File.FileName;
+                        string fullPath = Path.Combine(uploads, fileName);
+                        vModel.File.CopyTo(new FileStream(fullPath, FileMode.Create));   
+                    }
+
                     if (vModel.AuthorId < 0)
                     {
                         ViewBag.Message = "Please select an Author from the list";
@@ -69,6 +85,7 @@ namespace BookStore.Controllers
                         Id = vModel.BookId,
                         Title = vModel.Title,
                         Description = vModel.Description,
+                        ImageUrl = fileName,
                         Author = author
                     };
                     bookRepository.Add(book);
@@ -95,6 +112,7 @@ namespace BookStore.Controllers
                 BookId = book.Id,
                 Title = book.Title,
                 Description = book.Description,
+                ImageUrl = book.ImageUrl,
                 AuthorId = authorId,
                 Authors = authorRepository.list().ToList()
             };
@@ -109,11 +127,33 @@ namespace BookStore.Controllers
         {
             try
             {
+                string fileName = string.Empty;
+
+                if (vModel.File != null)
+                {
+                    string uploads = Path.Combine(hosting.WebRootPath, "uploads");
+                    fileName = vModel.File.FileName;
+                    string fullPath = Path.Combine(uploads, fileName);
+                    //Get the old file
+                    string oldFilename = bookRepository.Find(id).ImageUrl;
+                    string oldFullPath = Path.Combine(uploads, oldFilename);
+                    
+                    // if the have the same path or name dont add it
+                    if (oldFullPath != fullPath)
+                    {
+                        //Delete the old file
+                        System.IO.File.Delete(oldFullPath);
+                        //Save the new file
+                        vModel.File.CopyTo(new FileStream(fullPath, FileMode.Create));
+                    }
+                }
                 var author = authorRepository.Find(vModel.AuthorId);
                 var book = new Book
                 {
+                    Id = id,
                     Title = vModel.Title,
                     Description = vModel.Description,
+                    ImageUrl = fileName,
                     Author = author
                 };
                 bookRepository.Update(id, book);
