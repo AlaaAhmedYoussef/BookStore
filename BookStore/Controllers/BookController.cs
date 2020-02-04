@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BookStore.Controllers
 {
-    public class BookController : Controller
+    public partial class BookController : Controller
     {
         private readonly IBookStoreRepository<Book> bookRepository;
         private readonly IBookStoreRepository<Author> authorRepository;
@@ -119,31 +119,8 @@ namespace BookStore.Controllers
         {
             try
             {
-                string fileName = string.Empty;
+                string fileName = UploadFile(vModel.File, vModel.ImageUrl);
 
-                if (vModel.File != null)
-                {
-                    string uploads = Path.Combine(hosting.WebRootPath, "uploads");
-                    fileName = vModel.File.FileName;
-                    string fullPath = Path.Combine(uploads, fileName);
-
-                    string oldFullPath = string.Empty;
-                    if (vModel.ImageUrl != null)
-                    {
-                        //Get the old file
-                        string oldFilename = vModel.ImageUrl;
-                        oldFullPath = Path.Combine(uploads, oldFilename);
-                        //Delete the old file
-                        System.IO.File.Delete(oldFullPath);
-                    }
-                  
-                    // if the have the same path or name dont add it
-                    if (oldFullPath != fullPath)
-                    {
-                        //Save the new file
-                        vModel.File.CopyTo(new FileStream(fullPath, FileMode.Create));
-                    }
-                }
                 var author = authorRepository.Find(vModel.AuthorId);
                 var book = new Book
                 {
@@ -188,33 +165,11 @@ namespace BookStore.Controllers
             }
         }
 
-        List<Author> FillSelectList()
+        public ActionResult Search(string term)
         {
-            var authors = authorRepository.list().ToList();
-            authors.Insert(0, new Author { Id = -1, FullName = "--- Please select an Author ---" });
+            var result = bookRepository.Search(term);
 
-            return authors;
+            return View("Index", result);
         }
-
-        BookAuthorViewModel GetAllAuthors() { 
-            var vModel = new BookAuthorViewModel
-            {
-                Authors = FillSelectList()
-            };
-            return vModel;
-        }
-
-        string UploadFile(IFormFile file)
-        {
-            if (file != null)
-            {
-                string uploads = Path.Combine(hosting.WebRootPath, "uploads");
-                string fullPath = Path.Combine(uploads, file.FileName);
-                file.CopyTo(new FileStream(fullPath, FileMode.Create));
-                return file.FileName;
-            }
-            return null;
-        }
-       
-}
+    }
 }
