@@ -1,4 +1,5 @@
 ﻿using BookStore.Models;
+using BookStore.Models.Respositories;
 using BookStore.ViewModels;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -34,7 +35,10 @@ namespace BookStore.Controllers
             {
                 string uploads = Path.Combine(hosting.WebRootPath, "uploads");
                 string fullPath = Path.Combine(uploads, file.FileName);
-                file.CopyTo(new FileStream(fullPath, FileMode.Create));
+                using (var fileStream = new FileStream(fullPath, FileMode.Create))
+                {
+                    file.CopyTo(fileStream);
+                }
                 return file.FileName;
             }
             return null;
@@ -56,9 +60,7 @@ namespace BookStore.Controllers
                     oldPath = Path.Combine(uploads, imageUrl);
                     //Delete the old file
 
-                    // if (System.IO.File.Exists(oldPath) && IsNotShared(imageUrl)) -------later development
-
-                    if (System.IO.File.Exists(oldPath))
+                    if (System.IO.File.Exists(oldPath) && bookRepository.IsNotShared(imageUrl))
                     {
                         System.IO.File.Delete(oldPath);
                     }
@@ -69,7 +71,11 @@ namespace BookStore.Controllers
                 if (oldPath != newPath)
                 {
                     //Save the new file
-                    file.CopyTo(new FileStream(newPath, FileMode.Create));
+                    using (var fileStream = new FileStream(newPath, FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                    
                 }
 
                 return file.FileName;
@@ -77,14 +83,6 @@ namespace BookStore.Controllers
 
             return imageUrl;
         }
-
-        /* search database for imageUrl if count > 1  ? false : true 
-        bool IsNotShared(string imageUrl)
-        {
-            // 
-            if (imageUrl )
-            return true;
-        }
-        */
+     
     }
 }

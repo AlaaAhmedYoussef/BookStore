@@ -35,20 +35,30 @@ namespace BookStore.Models.Respositories
             return author;
         }
 
+        public bool IsNotShared(string imgUrl)
+        {
+            throw new NotImplementedException();
+        }
+
         public IList<Author> list()
         {
             return db.Authors.ToList();
         }
 
-        public List<Author> Search(string term)
+        public List<Book> Search(string term)
         {
-            return db.Authors.Where(a => a.FullName.Contains(term)).ToList();
+            throw new NotImplementedException();
         }
 
         public void Update(int id, Author newAuthor)
         {            
             db.Update(newAuthor);
             db.SaveChanges();
+        }
+
+        List<Author> IBookStoreRepository<Author>.Search(string term)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -37,6 +37,11 @@ namespace BookStore.Models.Respositories
             return author;
         }
 
+        public bool IsNotShared(string imgUrl)
+        {
+            throw new NotImplementedException();
+        }
+
         public IList<Author> list()
         {
             return authors;
@@ -53,5 +58,6 @@ namespace BookStore.Models.Respositories
 
             author.FullName = newAuthor.FullName;
         }
+
     }
 }

@@ -57,6 +57,13 @@ namespace BookStore.Models.Respositories
             return book;
         }
 
+        public bool IsNotShared(string imgUrl)
+        {
+            var count = books.Count(b => b.ImageUrl == imgUrl);
+
+            return (count > 1 ? false : true);
+        }
+
         public IList<Book> list()
         {
             return books;

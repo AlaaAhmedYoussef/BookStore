@@ -13,5 +13,6 @@ namespace BookStore.Models.Respositories
         void Update(int id, TEntity entity);
         void Delete(int id);
         List<TEntity> Search(string term);
+        bool IsNotShared(string imgUrl);
     }   
 }
