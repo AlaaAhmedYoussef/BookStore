@@ -32,7 +32,7 @@ namespace BookStore
             services.AddScoped<IBookStoreRepository<Book>, BookDBRepository>();
             services.AddDbContext<BookStoreDbContext>( options => 
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(configuration.GetConnectionString("SqlCon"));
             });
         }
 
