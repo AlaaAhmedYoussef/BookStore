@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using BookStore.Models;
@@ -16,11 +15,11 @@ namespace BookStore.Controllers
     {
         private readonly IBookStoreRepository<Book> bookRepository;
         private readonly IBookStoreRepository<Author> authorRepository;
-        private readonly IHostingEnvironment hosting;
+        private readonly IWebHostEnvironment hosting;
 
         public BookController(IBookStoreRepository<Book> _bookRepository,
             IBookStoreRepository<Author> _authorRepository,
-            IHostingEnvironment _hosting)
+            IWebHostEnvironment _hosting)
         {
             this.bookRepository = _bookRepository;
             this.authorRepository = _authorRepository;
@@ -144,7 +143,7 @@ namespace BookStore.Controllers
         public ActionResult Delete(int id)
         {
             var book = bookRepository.Find(id);
-            
+
             return View(book);
         }
 
